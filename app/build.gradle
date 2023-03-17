@@ -79,12 +79,14 @@ dependencies {
     // implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
     // implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
 
-    // Retrofit with Moshi Converter
-    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
 
     // Retrofit with Scalars Converter
+    //implementation "com.squareup.retrofit2:retrofit: $version_retrofit"
+    //implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
+
+    // Retrofit with Moshi Converter
     implementation "com.squareup.retrofit2:retrofit: $version_retrofit"
-    implementation "com.squareup.retrofit2:converter-scalars:$version_retrofit"
+    implementation "com.squareup.retrofit2:converter-moshi:$version_retrofit"
 
     // Coroutines - Deprecated - No more required
     // implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version_kotlin_coroutines"
