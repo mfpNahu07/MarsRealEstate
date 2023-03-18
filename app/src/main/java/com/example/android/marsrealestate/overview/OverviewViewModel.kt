@@ -22,6 +22,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.android.marsrealestate.network.MarsApi
 import com.example.android.marsrealestate.network.MarsProperty
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,6 +42,9 @@ class OverviewViewModel : ViewModel() {
     val response: LiveData<String>
         get() = _response
 
+    private var viewModelJob = Job()
+    private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
+
     /**
      * Call getMarsRealEstateProperties() on init so we can display status immediately.
      */
@@ -51,17 +58,23 @@ class OverviewViewModel : ViewModel() {
 
 
     private fun getMarsRealEstateProperties() {
-        MarsApi.retrofitService.getProperties().enqueue(object : Callback<List<MarsProperty>> {
-            override fun onResponse(
-                call: Call<List<MarsProperty>>,
-                response: Response<List<MarsProperty>>
-            ) {
-                _response.value = "Success: ${response.body()?.size} Mars properties retrieved"
-            }
-
-            override fun onFailure(call: Call<List<MarsProperty>>, t: Throwable) {
+        coroutineScope.launch {
+            var getPropertiesDeferred =
+                MarsApi.retrofitService.getProperties()  //creates and starts the network call in a background thread, returning the deferred
+            try {
+                var listResult =
+                    getPropertiesDeferred.await() // calling await() on the deferred returns the result from the network call when the value is ready
+                _response.value = "Success: ${listResult.size} Mars properties retrieved"
+            } catch (t: Throwable) {
                 _response.value = "Failure: " + t.message
             }
-        })
+
+        }
+
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()  //loading data should stop when the viewModel is destroyed. Cancel Job in onCleared
     }
 }
