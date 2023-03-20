@@ -30,13 +30,17 @@ import kotlinx.coroutines.launch
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
+
+enum class MarsApiStatus { LOADING, ERROR, DONE }
+
 class OverviewViewModel : ViewModel() {
 
     // The internal MutableLiveData String that stores the status of the most recent request
-    private val _status = MutableLiveData<String>()
+    private val _status = MutableLiveData<MarsApiStatus>()
 
     // The external immutable LiveData for the request status String
-    val response: LiveData<String>
+
+    val status: LiveData<MarsApiStatus>
         get() = _status
 
 
@@ -65,14 +69,18 @@ class OverviewViewModel : ViewModel() {
             var getPropertiesDeferred =
                 MarsApi.retrofitService.getProperties()  //creates and starts the network call in a background thread, returning the deferred
             try {
+                _status.value = MarsApiStatus.LOADING
                 var listResult =
                     getPropertiesDeferred.await() // calling await() on the deferred returns the result from the network call when the value is ready
-                if(listResult.size>0){
-                    _properties.value = listResult
-                }
+
+
+                _status.value = MarsApiStatus.DONE
+                _properties.value = listResult
+
                 //_status.value = "Success: ${listResult.size} Mars properties retrieved"
             } catch (e: Exception) {
-                _status.value = "Failure: " + e.message
+                _status.value = MarsApiStatus.ERROR
+                _properties.value = ArrayList()
             }
 
         }
