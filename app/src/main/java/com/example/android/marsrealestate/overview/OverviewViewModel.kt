@@ -40,10 +40,10 @@ class OverviewViewModel : ViewModel() {
         get() = _status
 
 
-    private val _property = MutableLiveData<MarsProperty>()
+    private val _properties = MutableLiveData<List<MarsProperty>>()
 
-    val property: LiveData<MarsProperty>
-        get() = _property
+    val properties: LiveData<List<MarsProperty>>
+        get() = _properties
 
     private var viewModelJob = Job()
     private val coroutineScope = CoroutineScope(viewModelJob + Dispatchers.Main)
@@ -68,7 +68,7 @@ class OverviewViewModel : ViewModel() {
                 var listResult =
                     getPropertiesDeferred.await() // calling await() on the deferred returns the result from the network call when the value is ready
                 if(listResult.size>0){
-                    _property.value = listResult[0]
+                    _properties.value = listResult
                 }
                 //_status.value = "Success: ${listResult.size} Mars properties retrieved"
             } catch (e: Exception) {
