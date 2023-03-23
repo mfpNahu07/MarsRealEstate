@@ -27,8 +27,12 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 //import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.create
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 private const val BASE_URL = "https://mars.udacity.com/"
+
+//Defines constants to match the query values our web service expects
+enum class MarsApiFilter(val value: String) { SHOW_RENT("rent"), SHOW_BUY("buy"), SHOW_ALL("all") }
 
 //Retrofit builder with ConverterFactory and BASE_URL
 /*private val retrofit = Retrofit.Builder()
@@ -69,8 +73,8 @@ Conceptually similar the way Room implements DAO's*/
 
 interface MarsApiService {
     @GET("realestate")
-    fun getProperties():
-            //Call<List<MarsProperty>>
+    fun getProperties(@Query("filter") type: String):  //filter properties based on the MarsApiFilter enum values
+    //Call<List<MarsProperty>>
             Deferred<List<MarsProperty>>
 }
 
